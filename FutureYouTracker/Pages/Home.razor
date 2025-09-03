@@ -1,7 +1,201 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
 
-<PageTitle>Home</PageTitle>
+<PageTitle>FutureYou - Transform Your Goals Into Reality 🚀</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="landing-page" data-theme="light">
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">FutureYou ✨</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#team">Team</a></li>
+                    <li><a href="#cta">Get Started</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" @onclick="ToggleTheme">
+                🌙 Dark Mode
+            </button>
+        </div>
+    </header>
 
-Welcome to your new app.
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title floating">Transform Your Goals Into Reality 🚀</h1>
+            <p class="hero-subtitle">Your personal journey to self-improvement starts here</p>
+            <p class="hero-description">
+                FutureYou is the ultimate goal tracking platform that turns your dreams into achievable milestones. 
+                Track progress, build habits, and celebrate every victory on your path to becoming the best version of yourself. 💪
+            </p>
+            <div class="hero-cta">
+                <a href="#cta" class="btn-primary">Start Your Journey 🎯</a>
+                <a href="#features" class="btn-secondary">Learn More 📖</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div style="text-align: center; margin-bottom: 60px;">
+            <h2>🎯 Core Features</h2>
+            <p style="font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+                Everything you need to track, achieve, and celebrate your personal growth journey
+            </p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3 class="feature-title">Smart Goal Management</h3>
+                <p class="feature-description">
+                    Create and categorize goals with our SMART framework. Set targets for Health, Career, Learning, and more. 
+                    Break down big dreams into achievable milestones with intelligent deadline tracking.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Progress Tracking</h3>
+                <p class="feature-description">
+                    Daily check-ins made simple! Track habits, log progress, and maintain streaks. 
+                    Our intuitive interface makes it easy to record your wins in under 30 seconds.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3 class="feature-title">Visual Analytics</h3>
+                <p class="feature-description">
+                    Beautiful charts, calendar heat maps, and progress dashboards that motivate you to keep going. 
+                    See your growth patterns and celebrate consistency with engaging visualizations.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Motivation Engine</h3>
+                <p class="feature-description">
+                    Achievement badges, milestone celebrations, and gentle reminders keep you motivated. 
+                    Turn self-improvement into an engaging journey with rewards for every step forward.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3 class="feature-title">Mobile-First Design</h3>
+                <p class="feature-description">
+                    Responsive design that works perfectly on any device. Track your progress on-the-go 
+                    with a beautiful, fast interface that adapts to your lifestyle.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Privacy & Control</h3>
+                <p class="feature-description">
+                    Your data stays yours. Offline-first with browser storage, plus easy JSON export/import. 
+                    No backend required - complete privacy and control over your personal journey.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="team-section">
+        <div class="section">
+            <h2 style="color: white; text-align: center; margin-bottom: 20px;">🌟 Meet Our Team</h2>
+            <p style="color: rgba(255,255,255,0.9); text-align: center; font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+                Passionate individuals dedicated to helping you achieve your goals and become the best version of yourself
+            </p>
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="/images/employees/1631529528340.jpeg" alt="Team Member" class="team-avatar" />
+                    <h4 class="team-name">Alex Johnson</h4>
+                    <p class="team-role">Goal Achievement Specialist</p>
+                </div>
+                
+                <div class="team-member">
+                    <img src="/images/employees/1691581319612.jpeg" alt="Team Member" class="team-avatar" />
+                    <h4 class="team-name">Sarah Chen</h4>
+                    <p class="team-role">Habit Formation Expert</p>
+                </div>
+                
+                <div class="team-member">
+                    <img src="/images/employees/1751451891932.jpeg" alt="Team Member" class="team-avatar" />
+                    <h4 class="team-name">Marcus Rodriguez</h4>
+                    <p class="team-role">Personal Development Coach</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="cta" class="cta-section">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Transform Your Life? 🌟</h2>
+            <p class="cta-description">
+                Join thousands of people who have already started their journey to self-improvement. 
+                Your future self is waiting - let's make it happen together!
+            </p>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <a href="/goals" class="btn-primary" style="background: white; color: #000;">Get Started Free 🚀</a>
+                <a href="/counter" class="btn-secondary" style="border-color: white; color: white;">Try Demo 🎮</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#team">Team</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+                <a href="/support">Support</a>
+                <a href="/blog">Blog</a>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 FutureYou. All rights reserved. Made with ❤️ for your personal growth journey.</p>
+                <p style="margin-top: 10px;">🌟 Transform your goals into reality, one step at a time 🌟</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+    private bool isDarkMode = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check for saved theme preference
+            var savedTheme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "theme");
+            if (!string.IsNullOrEmpty(savedTheme))
+            {
+                isDarkMode = savedTheme == "dark";
+                await UpdateTheme();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDarkMode = !isDarkMode;
+        await UpdateTheme();
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "theme", isDarkMode ? "dark" : "light");
+    }
+
+    private async Task UpdateTheme()
+    {
+        var theme = isDarkMode ? "dark" : "light";
+        await JSRuntime.InvokeVoidAsync("eval", 
+            $"document.querySelector('.landing-page').setAttribute('data-theme', '{theme}')");
+    }
+}
