@@ -1,0 +1,270 @@
+@page "/goals"
+@using FutureYouTracker.Models
+@using FutureYouTracker.Services
+@inject ITargetService TargetService
+@inject NavigationManager Navigation
+
+<PageTitle>Goals - FutureYou</PageTitle>
+
+<div style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">🎯 Your Goals</h1>
+        <p style="font-size: 1.2rem; color: var(--text-light); opacity: 0.8;">
+            Transform your dreams into achievable milestones
+        </p>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <select @bind="selectedCategory" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #ddd;">
+                <option value="">All Categories</option>
+                @foreach (TargetCategory category in Enum.GetValues<TargetCategory>())
+                {
+                    <option value="@category">@category.GetDisplayName()</option>
+                }
+            </select>
+            
+            <select @bind="selectedPriority" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #ddd;">
+                <option value="">All Priorities</option>
+                @foreach (Priority priority in Enum.GetValues<Priority>())
+                {
+                    <option value="@priority">@priority.GetDisplayName()</option>
+                }
+            </select>
+        </div>
+        
+        <button class="btn-primary" @onclick="CreateNewTarget" style="white-space: nowrap;">
+            ➕ Create New Goal
+        </button>
+    </div>
+
+    @if (loading)
+    {
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+            <p>Loading your goals...</p>
+        </div>
+    }
+    else if (!filteredTargets.Any())
+    {
+        <div style="background: white; padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow-light); text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 2rem;">🎯</div>
+            <h2 style="color: var(--text-light); margin-bottom: 1rem;">
+                @(targets.Any() ? "No goals match your filters" : "Start Your Journey!")
+            </h2>
+            <p style="color: var(--text-light); opacity: 0.7; font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto 2rem;">
+                @(targets.Any() ? "Try adjusting your filters to see more goals." : "Create your first goal and start transforming your dreams into reality. Use the SMART framework to set achievable, meaningful targets.")
+            </p>
+            @if (!targets.Any())
+            {
+                <button class="btn-primary" @onclick="CreateNewTarget">
+                    🚀 Create Your First Goal
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        <div style="display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">
+            @foreach (var target in filteredTargets)
+            {
+                <div class="target-card" style="background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;" 
+                     @onclick="() => ViewTarget(target.Id)">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.5rem;">@target.Category.GetIcon()</span>
+                            <span style="font-size: 0.9rem; color: #666;">@target.Category.GetDisplayName()</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>@target.Priority.GetIcon()</span>
+                            @if (target.IsOverdue)
+                            {
+                                <span style="background: #ffebee; color: #c62828; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">
+                                    ⚠️ Overdue
+                                </span>
+                            }
+                            @if (target.IsCompleted)
+                            {
+                                <span style="background: #e8f5e8; color: #2e7d32; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">
+                                    ✅ Completed
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; line-height: 1.4; color: #333;">@target.Title</h3>
+                    
+                    @if (!string.IsNullOrEmpty(target.Description))
+                    {
+                        <p style="color: #666; margin: 0 0 1rem 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            @target.Description
+                        </p>
+                    }
+
+                    @if (target.Milestones.Any())
+                    {
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.9rem; color: #666;">Progress</span>
+                                <span style="font-size: 0.9rem; color: #666;">@(target.CompletionPercentage.ToString("F0"))%</span>
+                            </div>
+                            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #ffd54f, #ffb300); height: 100%; width: @(target.CompletionPercentage)%; transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (target.DueDate.HasValue)
+                    {
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.9rem; color: #666;">
+                            <span>📅</span>
+                            <span>Due: @target.DueDate.Value.ToString("MMM dd, yyyy")</span>
+                            @if (target.DaysUntilDue < 7 && target.DaysUntilDue >= 0 && !target.IsCompleted)
+                            {
+                                <span style="color: #ff9800;">(in @target.DaysUntilDue days)</span>
+                            }
+                        </div>
+                    }
+
+                    @if (target.GetTagList().Any())
+                    {
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                            @foreach (var tag in target.GetTagList().Take(3))
+                            {
+                                <span style="background: #f5f5f5; color: #666; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem;">
+                                    #@tag
+                                </span>
+                            }
+                            @if (target.GetTagList().Count > 3)
+                            {
+                                <span style="color: #666; font-size: 0.8rem;">+@(target.GetTagList().Count - 3) more</span>
+                            }
+                        </div>
+                    }
+
+                    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        @if (!target.IsCompleted)
+                        {
+                            <button class="btn-secondary" @onclick:stopPropagation="true" @onclick="() => CompleteTarget(target.Id)" 
+                                    style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                ✅ Complete
+                            </button>
+                        }
+                        <button class="btn-secondary" @onclick:stopPropagation="true" @onclick="() => EditTarget(target.Id)" 
+                                style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                            ✏️ Edit
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .target-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+        color: black;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(255, 179, 0, 0.4);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #333;
+        border: 1px solid #ddd;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+        background: #f5f5f5;
+        border-color: #bbb;
+    }
+</style>
+
+@code {
+    private List<Target> targets = new();
+    private List<Target> filteredTargets = new();
+    private bool loading = true;
+    private string selectedCategory = "";
+    private string selectedPriority = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTargets();
+    }
+
+    private async Task LoadTargets()
+    {
+        loading = true;
+        targets = await TargetService.GetAllTargetsAsync();
+        FilterTargets();
+        loading = false;
+    }
+
+    private void FilterTargets()
+    {
+        filteredTargets = targets.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(selectedCategory) && Enum.TryParse<TargetCategory>(selectedCategory, out var category))
+        {
+            filteredTargets = filteredTargets.Where(t => t.Category == category);
+        }
+
+        if (!string.IsNullOrEmpty(selectedPriority) && Enum.TryParse<Priority>(selectedPriority, out var priority))
+        {
+            filteredTargets = filteredTargets.Where(t => t.Priority == priority);
+        }
+
+        // Sort by priority (urgent first), then by due date, then by creation date
+        filteredTargets = filteredTargets
+            .OrderBy(t => t.IsCompleted ? 1 : 0)
+            .ThenByDescending(t => t.Priority)
+            .ThenBy(t => t.DueDate ?? DateTime.MaxValue)
+            .ThenByDescending(t => t.CreatedDate)
+            .ToList();
+    }
+
+    private void CreateNewTarget()
+    {
+        Navigation.NavigateTo("/goals/create");
+    }
+
+    private void ViewTarget(Guid id)
+    {
+        Navigation.NavigateTo($"/goals/details/{id}");
+    }
+
+    private void EditTarget(Guid id)
+    {
+        Navigation.NavigateTo($"/goals/edit/{id}");
+    }
+
+    private async Task CompleteTarget(Guid id)
+    {
+        await TargetService.CompleteTargetAsync(id);
+        await LoadTargets();
+    }
+}
